@@ -1,4 +1,5 @@
 const Task = require('../models/Task');
+const Project = require('../models/Project');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
 
@@ -37,13 +38,23 @@ exports.getTasks = asyncHandler(async (req, res, next) => {
 
 /**
  * @description Create Task
- * @route POST /api/v1/tasks/
+ * @route POST /api/v1/projects/:projectId/tasks/
  * @access Private
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
 exports.createTask = asyncHandler(async (req, res, next) => {
+  // Add project to the request body
+  req.body.project = req.params.projectId;
+  const project = Project.findById(req.body.project);
+
+  if (!project) {
+    return next(
+      new ErrorResponse(`No project was found with the requested ID`, 404)
+    );
+  }
+
   const task = await Task.create(req.body);
   res.status(201).json({
     success: true,
@@ -53,14 +64,36 @@ exports.createTask = asyncHandler(async (req, res, next) => {
 
 /**
  * @description Get task
- * @route GET /api/v1/tasks/:id
+ * @route GET /api/v1/projects/:projectId/tasks/:id
  * @access Public
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
 exports.getTask = asyncHandler(async (req, res, next) => {
+  // Verify if the request contains a projectId
+  if (req.params.projectId) {
+    const project = await Project.findById(req.params.projectId);
+    if (!project) {
+      if (!project) {
+        const error = new ErrorResponse(
+          'A project with the requested ID was not found',
+          404
+        );
+        return next(error);
+      }
+    }
+  }
+
   const task = await Task.findById(req.params.id);
+
+  if (!task) {
+    const error = new ErrorResponse(
+      'A task with the requested ID was not found',
+      404
+    );
+    return next(error);
+  }
 
   res.status(200).json({
     success: true,
@@ -70,21 +103,38 @@ exports.getTask = asyncHandler(async (req, res, next) => {
 
 /**
  * @description Update task
- * @route PUT /api/v1/tasks/:id
+ * @route PUT /api/v1/projects/:projectId/tasks/:id
  * @access Private
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
 exports.updateTask = asyncHandler(async (req, res, next) => {
+  // Verify if the request contains a projectId
+  if (req.params.projectId) {
+    const project = await Project.findById(req.params.projectId);
+    if (!project) {
+      if (!project) {
+        const error = new ErrorResponse(
+          'A project with the requested ID was not found',
+          404
+        );
+        return next(error);
+      }
+    }
+  }
+
   const task = await Task.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
   });
+
   if (!task) {
-    return next(
-      new ErrorResponse('A task with the requested ID was not found', 404)
+    const error = new ErrorResponse(
+      'A task with the requested ID was not found',
+      404
     );
+    return next(error);
   }
 
   res.status(200).json({
@@ -95,15 +145,37 @@ exports.updateTask = asyncHandler(async (req, res, next) => {
 
 /**
  * @description Delete task
- * @route DELETE /api/v1/tasks/:id
+ * @route DELETE /api/v1/projects/:projectId/tasks/:id
  * @access Private
  * @param {*} req
  * @param {*} res
  * @param {*} next
  */
 exports.deleteTask = asyncHandler(async (req, res, next) => {
-  const task = await Task.findById(req.params.id);
-  task.remove();
+  // Verify if the request contains a projectId
+  if (req.params.projectId) {
+    const project = await Project.findById(req.params.projectId);
+    if (!project) {
+      if (!project) {
+        const error = new ErrorResponse(
+          'A project with the requested ID was not found',
+          404
+        );
+        return next(error);
+      }
+    }
+  }
 
+  const task = await Task.findById(req.params.id);
+
+  if (!task) {
+    const error = new ErrorResponse(
+      'A task with the requested ID was not found',
+      404
+    );
+    return next(error);
+  }
+
+  task.remove();
   res.status(200).json({ success: true, data: {} });
 });

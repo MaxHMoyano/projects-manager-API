@@ -1,5 +1,6 @@
 const Project = require('../models/Project');
 const asyncHandler = require('../middleware/async');
+const ErrorResponse = require('../utils/errorResponse');
 
 /**
  * @description Get all projects
@@ -91,6 +92,14 @@ exports.getProjects = asyncHandler(async (req, res, next) => {
 exports.getProject = asyncHandler(async (req, res, next) => {
   const project = await Project.findById(req.params.id);
 
+  if (!project) {
+    const error = new ErrorResponse(
+      'A project with the requested ID was not found',
+      404
+    );
+    return next(error);
+  }
+
   res.status(200).json({
     success: true,
     data: project,
@@ -126,10 +135,13 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
     new: true,
     runValidators: true,
   });
+
   if (!project) {
-    return next(
-      new ErrorResponse('A project with the requested ID was not found', 404)
+    const error = new ErrorResponse(
+      'A project with the requested ID was not found',
+      404
     );
+    return next(error);
   }
 
   res.status(200).json({ success: true, data: project });
@@ -145,6 +157,15 @@ exports.updateProject = asyncHandler(async (req, res, next) => {
  */
 exports.deleteProject = asyncHandler(async (req, res, next) => {
   const project = await Project.findById(req.params.id);
+
+  if (!project) {
+    const error = new ErrorResponse(
+      'A project with the requested ID was not found',
+      404
+    );
+    return next(error);
+  }
+
   project.remove();
 
   res.status(200).json({ success: true, data: {} });

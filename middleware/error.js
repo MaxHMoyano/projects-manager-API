@@ -2,10 +2,7 @@ const colors = require('colors');
 const ErrorResponse = require('../utils/errorResponse');
 
 const errorHandler = (err, req, res, next) => {
-  console.log(`${err}`.bold.red);
-  let error = { ...err };
-
-  console.log(error);
+  let error = err;
 
   // Mongoose bad objectId
   if (error.name === 'CastError') {
@@ -33,6 +30,7 @@ const errorHandler = (err, req, res, next) => {
     );
   }
 
+  console.log(error.message);
   res.status(error.statusCode || 500).json({
     success: false,
     error: error.message || 'Server Error',
