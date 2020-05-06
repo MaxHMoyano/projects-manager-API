@@ -27,9 +27,13 @@ if (process.env.NODE_ENV === 'development') {
 
 // routes
 const projects = require('./routes/projects');
+const tasks = require('./routes/tasks');
 
 // mount routers
 app.use('/api/v1/projects', projects);
+app.use('/api/v1/tasks', tasks);
+
+// Error handler middleware
 app.use(errorHandler);
 
 const server = app.listen(PORT, () => {

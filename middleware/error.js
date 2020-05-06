@@ -2,9 +2,10 @@ const colors = require('colors');
 const ErrorResponse = require('../utils/errorResponse');
 
 const errorHandler = (err, req, res, next) => {
+  console.log(`${err}`.bold.red);
   let error = { ...err };
 
-  console.log(error.code);
+  console.log(error);
 
   // Mongoose bad objectId
   if (error.name === 'CastError') {
