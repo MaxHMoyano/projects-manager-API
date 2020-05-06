@@ -18,6 +18,10 @@ const ProjectSchema = new mongoose.Schema(
         'La descripción no puede contener mas de 500 caracteres',
       ],
     },
+    completedPercentage: {
+      type: Number,
+      required: false,
+    },
     priority: {
       type: Number,
       required: [true, 'La prioridad es requerida'],
@@ -28,7 +32,7 @@ const ProjectSchema = new mongoose.Schema(
       type: Date,
       required: false,
     },
-    estimatedEndDate: {
+    estimatedCompletionDate: {
       type: Date,
       required: [true, 'La fecha estimada de finalización es requerida'],
     },
@@ -51,11 +55,11 @@ const ProjectSchema = new mongoose.Schema(
       type: [String],
       required: false,
     },
-    type: {
-      type: [String],
-      required: true,
-      enum: ['Personal Experience', 'Work', 'Learning', 'Other'],
-    },
+    // type: {
+    //   type: [String],
+    //   required: true,
+    //   enum: ['Personal Experience', 'Work', 'Learning', 'Other'],
+    // },
   },
   {
     toJSON: { virtuals: true },

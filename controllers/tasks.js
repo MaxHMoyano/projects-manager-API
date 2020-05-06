@@ -23,10 +23,8 @@ exports.getTasks = asyncHandler(async (req, res, next) => {
       select: 'name description estimatedEndDate',
     });
   }
-
   // Finding resources
   const tasks = await query;
-
   // OK
   res.status(200).json({
     success: true,
@@ -167,7 +165,6 @@ exports.deleteTask = asyncHandler(async (req, res, next) => {
   }
 
   const task = await Task.findById(req.params.id);
-
   if (!task) {
     const error = new ErrorResponse(
       'A task with the requested ID was not found',
@@ -177,5 +174,5 @@ exports.deleteTask = asyncHandler(async (req, res, next) => {
   }
 
   task.remove();
-  res.status(200).json({ success: true, data: {} });
+  res.status(204).json({ success: true, data: {} });
 });
