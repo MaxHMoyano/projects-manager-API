@@ -1,7 +1,7 @@
+const path = require('path');
 const Project = require('../models/Project');
 const asyncHandler = require('../middleware/async');
 const ErrorResponse = require('../utils/errorResponse');
-
 /**
  * @description Get all projects
  * @route GET /api/v1/projects
@@ -11,74 +11,8 @@ const ErrorResponse = require('../utils/errorResponse');
  * @param {*} next
  */
 exports.getProjects = asyncHandler(async (req, res, next) => {
-  let queryParams, fields, sortBy;
-  // Make a copy of the query parameters
-  const reqQuery = { ...req.query };
-
-  // Fields to exclude
-  const removeFields = ['select', 'sort', 'page', 'limit'];
-
-  // Loop on removeFields and delete them from query
-  removeFields.forEach((param) => delete reqQuery[param]);
-
-  let queryParamsStr = JSON.stringify(reqQuery);
-
-  if (req.query.select) {
-    fields = req.query.select.split(',').join(' ');
-  }
-
-  //sorting
-  if (req.query.sort) {
-    sortBy = req.query.sort.split(',').join(' ');
-  } else {
-    sortBy = 'createdAt';
-  }
-
-  // This is for looking fields with operators
-  queryParamsStr = queryParamsStr.replace(
-    /\b(gt|gte|lt|lte|in)\b/g,
-    (match) => `$${match}`
-  );
-  queryParams = JSON.parse(queryParamsStr);
-
-  // pagination
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 10;
-  const startIndex = (page - 1) * limit;
-  const endIndex = page * limit;
-  const total = await Project.countDocuments();
-
-  // Pagination result
-  const pagination = {};
-  if (endIndex < total) {
-    pagination.next = {
-      page: page + 1,
-      limit,
-    };
-  }
-
-  if (startIndex > 0) {
-    pagination.previous = {
-      page: page - 1,
-      limit,
-    };
-  }
-
-  // Finding resources
-  const projects = await Project.find(queryParams)
-    .populate('tasks')
-    .select(fields)
-    .sort(sortBy)
-    .skip(startIndex)
-    .limit(limit);
-
   // OK
-  res.status(200).json({
-    success: true,
-    count: projects.length,
-    data: projects,
-    pagination,
-  });
+  res.status(200).json(res.advancedResults);
 });
 
 /**
@@ -169,4 +103,57 @@ exports.deleteProject = asyncHandler(async (req, res, next) => {
   project.remove();
 
   res.status(204).json({ success: true, data: {} });
+});
+
+/**
+ * @description Upload project photo
+ * @route PUT /api/v1/projects/:id/photo
+ * @access Private
+ * @param {*} req
+ * @param {*} res
+ * @param {*} next
+ */
+exports.uploadProjectPhoto = asyncHandler(async (req, res, next) => {
+  const project = await Project.findById(req.params.id);
+
+  if (!project) {
+    const error = new ErrorResponse(
+      'A project with the requested ID was not found',
+      404
+    );
+    return next(error);
+  }
+
+  if (!req.files) {
+    return next(new ErrorResponse('A file was not found on the request', 400));
+  }
+  const file = req.files.file;
+  // Make sure the image is a photo
+  if (!file.mimetype.startsWith('image')) {
+    return next(
+      new ErrorResponse('The uploaded file was not a valid image file', 400)
+    );
+  }
+
+  // check files size
+  if (file.size > process.env.MAX_FILE_SIZE) {
+    return next(
+      new ErrorResponse('The uploaded file size was grater than 1MB', 400)
+    );
+  }
+
+  // change name file to avoid replacements
+  file.name = `project-photo-${project._id}${path.parse(file.name).ext}`;
+
+  file.mv(`${process.env.FILE_UPLOAD_PATH}/${file.name}`, async (err) => {
+    if (err) {
+      console.error(err);
+      return next(
+        new ErrorResponse('There was a problem uploading the file', 500)
+      );
+    }
+
+    await project.update({ photo: file.name });
+    res.status(200).json({ success: true, data: project });
+  });
 });

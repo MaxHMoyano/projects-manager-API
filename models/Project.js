@@ -55,6 +55,10 @@ const ProjectSchema = new mongoose.Schema(
       type: [String],
       required: false,
     },
+    photo: {
+      type: String,
+      default: 'no-photo.jpg',
+    },
     // type: {
     //   type: [String],
     //   required: true,

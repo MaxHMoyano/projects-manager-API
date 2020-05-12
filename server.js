@@ -1,9 +1,11 @@
 const express = require('express');
+const path = require('path');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 const connectDb = require('./config/db');
 const colors = require('colors');
 const errorHandler = require('./middleware/error');
+const fileupload = require('express-fileupload');
 
 // enviroment variables
 const PORT = process.env.PORT || 5000;
@@ -24,6 +26,10 @@ app.use(express.json());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+// File uploading and static folder middleware
+app.use(fileupload());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // routes
 const projects = require('./routes/projects');

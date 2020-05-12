@@ -13,25 +13,16 @@ const ErrorResponse = require('../utils/errorResponse');
  * @param {*} next
  */
 exports.getTasks = asyncHandler(async (req, res, next) => {
-  let query;
-
   if (req.params.projectId) {
-    query = Task.find({ project: req.params.projectId });
-  } else {
-    query = Task.find().populate({
-      path: 'project',
-      select: 'name description estimatedEndDate',
+    const tasks = await Task.find({ project: req.params.projectId });
+    return res.status(200).json({
+      success: true,
+      count: tasks.length,
+      data: tasks,
     });
+  } else {
+    res.status(200).json(res.advancedResults);
   }
-  // Finding resources
-  const tasks = await query;
-  // OK
-  res.status(200).json({
-    success: true,
-    count: tasks.length,
-    data: tasks,
-    // pagination,
-  });
 });
 
 /**
