@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
-const slugify = require('slugify');
+import { Document, Model, model, Types, Schema, Query } from 'mongoose';
+import slugify from 'slugify';
 
-const ProjectSchema = new mongoose.Schema(
+const ProjectSchema = new Schema(
   {
     name: {
       type: String,
@@ -59,20 +59,29 @@ const ProjectSchema = new mongoose.Schema(
       type: String,
       default: 'no-photo.jpg',
     },
-    // type: {
-    //   type: [String],
-    //   required: true,
-    //   enum: ['Personal Experience', 'Work', 'Learning', 'Other'],
-    // },
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
+interface IProjectSchema extends Document {
+  name: string;
+  slug: string;
+  description: string;
+  completedPercentage: number;
+  priority: number;
+  startDate: Date;
+  estimatedCompletionDate: Date;
+  started: boolean;
+  finished: boolean;
+  keywords: string[];
+  photo: string;
+}
+
 // Create project slug from the name
-ProjectSchema.pre('save', function (next) {
+ProjectSchema.pre<IProjectSchema>('save', function (next) {
   this.slug = slugify(this.name, {
     lower: true,
   });
@@ -82,7 +91,7 @@ ProjectSchema.pre('save', function (next) {
 
 // Cascade delete tasks when a project is deleted
 
-ProjectSchema.pre('remove', async function (next) {
+ProjectSchema.pre<IProjectSchema>('remove', async function (next) {
   await this.model('Task').deleteMany({ project: this._id });
   next();
 });
@@ -96,4 +105,4 @@ ProjectSchema.virtual('tasks', {
   justOne: false,
 });
 
-module.exports = mongoose.model('Project', ProjectSchema);
+export default model<IProjectSchema>('Project', ProjectSchema);

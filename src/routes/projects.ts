@@ -1,18 +1,20 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const {
+
+// local imports
+import {
   getProjects,
   getProject,
   createProject,
   updateProject,
   deleteProject,
   uploadProjectPhoto,
-} = require('../controllers/projects');
-const Project = require('../models/Project');
-const advancedResults = require('../middleware/advancedResults');
+} from '../controllers/projects';
+import Project from '../models/Project';
+import advancedResults from '../middleware/advancedResults';
 
 // Include all other dependent resources routers
-const taskRouter = require('./tasks');
+import taskRouter from './tasks';
 
 // Re-route into other resources
 router.use('/:projectId/tasks', taskRouter);
@@ -24,4 +26,4 @@ router
 router.route('/:id/photo').put(uploadProjectPhoto);
 router.route('/:id').get(getProject).put(updateProject).delete(deleteProject);
 
-module.exports = router;
+export default router;

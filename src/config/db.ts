@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+import colors from 'colors';
 
 const connectDB = async () => {
   const conn = await mongoose.connect(process.env.MONGO_URI, {
@@ -11,4 +12,4 @@ const connectDB = async () => {
   console.log(`Mongo DB connected ${conn.connection.host}`.cyan.underline.bold);
 };
 
-module.exports = connectDB;
+export default connectDB;

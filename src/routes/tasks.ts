@@ -1,14 +1,16 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router({ mergeParams: true });
-const {
+
+// local imports
+import {
   getTasks,
   getTask,
   createTask,
   updateTask,
   deleteTask,
-} = require('../controllers/tasks');
-const Task = require('../models/Task');
-const advancedResults = require('../middleware/advancedResults');
+} from '../controllers/tasks';
+import Task from '../models/Task';
+import advancedResults from '../middleware/advancedResults';
 
 router
   .route('/')
@@ -17,9 +19,9 @@ router
       path: 'project',
       select: 'name description estimatedEndDate',
     }),
-    getTasks
+    getTasks,
   )
   .post(createTask);
 router.route('/:id').get(getTask).put(updateTask).delete(deleteTask);
 
-module.exports = router;
+export default router;

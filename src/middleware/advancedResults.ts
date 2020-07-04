@@ -1,4 +1,10 @@
-const advancedResults = (model, populate) => async (req, res, next) => {
+import { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
+
+const advancedResults = (
+  model: mongoose.Model<any>,
+  populate: string,
+) => async (req: Request, res: Response, next: NextFunction) => {
   let queryParams, fields, sortBy;
   // Make a copy of the query parameters
   const reqQuery = { ...req.query };
@@ -25,7 +31,7 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   // This is for looking fields with operators
   queryParamsStr = queryParamsStr.replace(
     /\b(gt|gte|lt|lte|in)\b/g,
-    (match) => `$${match}`
+    (match) => `$${match}`,
   );
   queryParams = JSON.parse(queryParamsStr);
 
@@ -77,4 +83,4 @@ const advancedResults = (model, populate) => async (req, res, next) => {
   next();
 };
 
-module.exports = advancedResults;
+export default advancedResults;

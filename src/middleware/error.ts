@@ -1,14 +1,19 @@
-const colors = require('colors');
-const ErrorResponse = require('../utils/errorResponse');
+import express from 'express';
+import ErrorResponse from '../utils/errorResponse';
 
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (
+  err: any,
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction,
+) => {
   let error = err;
 
   // Mongoose bad objectId
   if (error.name === 'CastError') {
     error = new ErrorResponse(
       `The resource with the requested ID of ${error.value} was not found`,
-      404
+      404,
     );
   }
 
@@ -16,7 +21,7 @@ const errorHandler = (err, req, res, next) => {
   if (error.code === 11000) {
     error = new ErrorResponse(
       `A resource is already created with those values`,
-      400
+      400,
     );
   }
 
@@ -24,9 +29,9 @@ const errorHandler = (err, req, res, next) => {
   if (error.name === 'ValidationError') {
     error = new ErrorResponse(
       Object.values(err.errors)
-        .map((e) => e.message)
+        .map((e: any) => e.message)
         .join(' ---  '),
-      400
+      400,
     );
   }
 
@@ -37,4 +42,4 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-module.exports = errorHandler;
+export default errorHandler;

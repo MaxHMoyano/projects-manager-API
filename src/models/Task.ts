@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+import { Document, Model, model, Types, Schema, Query } from 'mongoose';
 
-const TaskSchema = new mongoose.Schema({
+const TaskSchema = new Schema({
   name: {
     type: String,
     required: [true, 'El nombre de la tarea es requerida'],
@@ -30,14 +30,27 @@ const TaskSchema = new mongoose.Schema({
     required: false,
   },
   project: {
-    type: mongoose.Schema.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Project',
     required: true,
   },
 });
 
+interface ITaskSchema extends Document {
+  name: string;
+  description: string;
+  createdAt: Date;
+  priority: number;
+  finished: boolean;
+  finishDate: Date;
+  project: string;
+  getCompletedPercentage(projectId: String): Promise<void>;
+}
+
 // Static method to get the completed percentage of all tasks inside a project
-TaskSchema.statics.getCompletedPercentage = async function (projectId) {
+TaskSchema.statics.getCompletedPercentage = async function (
+  projectId: String,
+): Promise<void> {
   const aggregatedObj = await this.aggregate([
     { $match: { project: projectId } },
     {
@@ -59,21 +72,22 @@ TaskSchema.statics.getCompletedPercentage = async function (projectId) {
   try {
     await this.model('Project').findByIdAndUpdate(projectId, {
       completedPercentage: parseFloat(
-        aggregatedObj[0].completedPercentage
+        aggregatedObj[0].completedPercentage,
       ).toFixed(2),
     });
   } catch (error) {}
 };
 
+// Document middlewares
 // Call getCompletedPercentage after save and before delete
-
-TaskSchema.post('save', function (next) {
-  this.constructor.getCompletedPercentage(this.project);
-});
-
-TaskSchema.pre('remove', function (next) {
-  this.constructor.getCompletedPercentage(this.project);
+TaskSchema.pre<ITaskSchema>('remove', function (next) {
+  this.getCompletedPercentage(this.project);
   next();
 });
 
-module.exports = mongoose.model('Task', TaskSchema);
+// Query middlewares
+TaskSchema.post<ITaskSchema>('save', function (this: ITaskSchema, next) {
+  this.getCompletedPercentage(this.project);
+});
+
+export default model<ITaskSchema>('Task', TaskSchema);
