@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import Project from '../models/Project';
 import asyncHandler from '../middleware/async';
 import ErrorResponse from '../utils/errorResponse';
-import { FileRequest } from '../utils/interfaces';
+import { FileRequest } from '../utils/models';
 
 /**
  * @description Get all projects

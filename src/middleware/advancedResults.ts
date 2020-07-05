@@ -1,14 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
+import { ServerResponse, PopulateOptions } from '../utils/models';
 
 const advancedResults = (
   model: mongoose.Model<any>,
-  populate: string,
-) => async (req: Request, res: Response, next: NextFunction) => {
+  populate: PopulateOptions,
+) => async (req: Request, res: ServerResponse, next: NextFunction) => {
   let queryParams, fields, sortBy;
   // Make a copy of the query parameters
   const reqQuery = { ...req.query };
-
+  const params: any = req.query as any;
   // Fields to exclude
   const removeFields = ['select', 'sort', 'page', 'limit'];
 
@@ -17,13 +18,13 @@ const advancedResults = (
 
   let queryParamsStr = JSON.stringify(reqQuery);
 
-  if (req.query.select) {
-    fields = req.query.select.split(',').join(' ');
+  if (params.select) {
+    fields = params.select.split(',').join(' ');
   }
 
   //sorting
-  if (req.query.sort) {
-    sortBy = req.query.sort.split(',').join(' ');
+  if (params.sort) {
+    sortBy = params.sort.split(',').join(' ');
   } else {
     sortBy = 'createdAt';
   }
@@ -36,14 +37,14 @@ const advancedResults = (
   queryParams = JSON.parse(queryParamsStr);
 
   // pagination
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 10;
+  const page = parseInt(params.page, 10) || 1;
+  const limit = parseInt(params.limit, 10) || 10;
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
   const total = await model.countDocuments();
 
   // Pagination result
-  const pagination = {};
+  const pagination: any = {};
   if (endIndex < total) {
     pagination.next = {
       page: page + 1,
@@ -72,7 +73,6 @@ const advancedResults = (
 
   // Finding resources
   const results = await query;
-
   res.advancedResults = {
     success: true,
     count: total,

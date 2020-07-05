@@ -5,6 +5,7 @@ import Task from '../models/Task';
 import Project from '../models/Project';
 import ErrorResponse from '../utils/errorResponse';
 import asyncHandler from '../middleware/async';
+import { ServerResponse } from '../utils/models';
 
 /**
  * @description Get all tasks
@@ -16,7 +17,7 @@ import asyncHandler from '../middleware/async';
  * @param {*} next
  */
 export const getTasks = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: ServerResponse, next: NextFunction) => {
     if (req.params.projectId) {
       const tasks = await Task.find({ project: req.params.projectId });
       return res.status(200).json({
