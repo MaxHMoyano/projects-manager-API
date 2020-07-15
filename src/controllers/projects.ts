@@ -4,7 +4,6 @@ import { Request, Response, NextFunction } from 'express';
 import Project from '../models/Project';
 import asyncHandler from '../middleware/async';
 import ErrorResponse from '../utils/errorResponse';
-import { FileRequest } from '../utils/models';
 
 /**
  * @description Get all projects
@@ -128,7 +127,7 @@ export const deleteProject = asyncHandler(
  * @param {*} next
  */
 export const uploadProjectPhoto = asyncHandler(
-  async (req: FileRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     const project = await Project.findById(req.params.id);
 
     if (!project) {
@@ -144,9 +143,7 @@ export const uploadProjectPhoto = asyncHandler(
         new ErrorResponse('A file was not found on the request', 400),
       );
     }
-    // TODO: Debug the file property of request
-    // const file = req.files.file;
-    const file: any = {};
+    const file: any = req.files.photo;
     // Make sure the image is a photo
     if (!file.mimetype.startsWith('image')) {
       return next(

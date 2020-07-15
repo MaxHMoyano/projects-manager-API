@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import morgan from 'morgan';
+import fileupload from 'express-fileupload';
 
 // Local imports
 import connectDb from './config/db';
@@ -28,13 +29,13 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // File uploading and static folder middleware
-// app.use(fileupload());
+app.use(fileupload());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // routes
-const projects = require('./routes/projects');
-const tasks = require('./routes/tasks');
-const auth = require('./routes/auth');
+import projects from './routes/projects';
+import tasks from './routes/tasks';
+import auth from './routes/auth';
 
 // mount routers
 app.use('/api/v1/projects', projects);
