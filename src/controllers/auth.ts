@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 
+// Local imports
 import asyncHandler from '../middleware/async';
+import User from '../models/User';
+import { JsonResponse } from '../utils/models';
+
 /**
  * @description Register a user
  * @route POST /api/v1/auth/register
@@ -9,11 +13,18 @@ import asyncHandler from '../middleware/async';
  * @param {*} res
  * @param {*} next
  */
-
 export const register = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const {} = req.body;
+  async (req: Request, res: JsonResponse, next: NextFunction) => {
+    const { name, email, password, role } = req.body;
 
-    res.status(200).json({ success: true });
+    // Create user
+    const user = User.create({
+      name,
+      email,
+      password,
+      role,
+    });
+
+    res.status(200).json({ success: true, data: 'hola' });
   },
 );

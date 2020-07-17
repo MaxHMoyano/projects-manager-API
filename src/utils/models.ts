@@ -6,7 +6,7 @@ export interface Pagination {
   next: string;
 }
 
-export interface ServerResponse extends Response {
+export interface FetchResponse extends Response {
   advancedResults: AdvancedResults;
 }
 
@@ -23,4 +23,15 @@ interface AdvancedResults {
   count?: number;
   pagination?: Pagination;
   data: any | any[];
+}
+
+interface Json {
+  success: boolean;
+  data?: any | any[];
+}
+
+type Send<T = Response> = (body?: Json) => T;
+
+export interface JsonResponse extends Response {
+  json: Send<this>;
 }
