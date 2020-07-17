@@ -21,10 +21,7 @@ router.use('/:projectId/tasks', taskRouter);
 
 router
   .route('/')
-  .get(
-    // advancedResults(Project,'tasks'),
-    getProjects,
-  )
+  .get(advancedResults(Project, 'tasks'), getProjects)
   .post(createProject);
 router.route('/:id/photo').put(uploadProjectPhoto);
 router.route('/:id').get(getProject).put(updateProject).delete(deleteProject);

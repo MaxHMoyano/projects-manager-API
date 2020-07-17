@@ -1,6 +1,5 @@
 const fs = require('fs');
 const mongoose = require('mongoose');
-const colors = require('colors');
 const dotenv = require('dotenv');
 
 // Load env vars
@@ -20,11 +19,11 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Read JSON files
 const projects = JSON.parse(
-  fs.readFileSync(`${__dirname}/_data/projects.json`, 'utf-8')
+  fs.readFileSync(`${__dirname}/_data/projects.json`, 'utf-8'),
 );
 
 const tasks = JSON.parse(
-  fs.readFileSync(`${__dirname}/_data/tasks.json`, 'utf-8')
+  fs.readFileSync(`${__dirname}/_data/tasks.json`, 'utf-8'),
 );
 
 // Import into DB

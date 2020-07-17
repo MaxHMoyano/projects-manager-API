@@ -15,10 +15,10 @@ import advancedResults from '../middleware/advancedResults';
 router
   .route('/')
   .get(
-    // advancedResults(Task, {
-    //   path: 'project',
-    //   select: 'name description estimatedEndDate',
-    // }),
+    advancedResults(Task, {
+      path: 'project',
+      select: 'name description estimatedEndDate',
+    }),
     getTasks,
   )
   .post(createTask);

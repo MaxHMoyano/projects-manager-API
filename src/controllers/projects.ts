@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import Project from '../models/Project';
 import asyncHandler from '../middleware/async';
 import ErrorResponse from '../utils/errorResponse';
+import { ServerResponse } from '../utils/models';
 
 /**
  * @description Get all projects
@@ -14,9 +15,9 @@ import ErrorResponse from '../utils/errorResponse';
  * @param {*} next
  */
 export const getProjects = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: ServerResponse, next: NextFunction) => {
     // OK
-    // res.status(200).json(res.advancedResults);
+    res.status(200).json(res.advancedResults);
   },
 );
 

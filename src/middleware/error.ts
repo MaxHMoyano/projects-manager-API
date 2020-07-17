@@ -1,4 +1,7 @@
 import express from 'express';
+import chalk from 'chalk';
+
+// Local imports
 import ErrorResponse from '../utils/errorResponse';
 
 const errorHandler = (
@@ -35,7 +38,7 @@ const errorHandler = (
     );
   }
 
-  console.log(error.message);
+  console.log(chalk.bgRedBright(error.message));
   res.status(error.statusCode || 500).json({
     success: false,
     error: error.message || 'Server Error',
